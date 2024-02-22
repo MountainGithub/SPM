@@ -1,77 +1,57 @@
-import ttkbootstrap as ttk
-from ttkbootstrap.constants import *
+import customtkinter as ctk
+import tkinter as tk
 
-projects_data = (
-    ('FPS Game','C:/Users/Admin/Downloads/FPS Game.sb3','2/8/2024',3.8),
-    ('RPG Game','C:/Users/Admin/Desktop/RPG Game.sb3','1/1/2024',4.2),
-    ('Endless Game','C:/Users/Admin/Downloads/Endless Game.sb3','4/3/2023',2.3),
-    ('FPS Game','C:/Users/Admin/Downloads/FPS Game.sb3','2/8/2024',3.8),
-    ('RPG Game','C:/Users/Admin/Desktop/RPG Game.sb3','1/1/2024',4.2),
-    ('Endless Game','C:/Users/Admin/Downloads/Endless Game.sb3','4/3/2023',2.3),
-    ('FPS Game','C:/Users/Admin/Downloads/FPS Game.sb3','2/8/2024',3.8),
-    ('RPG Game','C:/Users/Admin/Desktop/RPG Game.sb3','1/1/2024',4.2),
-    ('Endless Game','C:/Users/Admin/Downloads/Endless Game.sb3','4/3/2023',2.3),
-    ('FPS Game','C:/Users/Admin/Downloads/FPS Game.sb3','2/8/2024',3.8),
-    ('RPG Game','C:/Users/Admin/Desktop/RPG Game.sb3','1/1/2024',4.2),
-    ('Endless Game','C:/Users/Admin/Downloads/Endless Game.sb3','4/3/2023',2.3),
-)
+def on_mouse_wheel(event):
+    if event.delta:
+        canvas.yview_scroll(-1*(event.delta//120), "units")
 
-def create_item(master, name:str, path:str, date:str, size:float):
-    frame = ttk.Frame(master=master,width=300)
-    
-    ttk.Label(frame, text=name).grid(column=0,row=0,sticky='NW',padx=(0,50))
-    ttk.Label(frame, text=path).grid(column=0,row=1,sticky='SW',padx=(0,50))
-    ttk.Label(frame, text=date).grid(column=1,row=0,sticky='NE')
-    ttk.Label(frame, text=f"{size}MB").grid(column=1,row=1,sticky='SE')
-    
-    return frame
+def on_scroll(event):
+    canvas.configure(scrollregion=canvas.bbox("all"))
+    update_scrollbars()
 
-class ScrollbarFrame(ttk.Frame):
-    def __init__(self, parent, **kwargs):
-        ttk.Frame.__init__(self, parent, **kwargs)
+def update_scrollbars():
+    if canvas.winfo_height() < canvas.canvasy(1):
+        vbar.pack(side="right", fill="y")
+    else:
+        vbar.pack_forget()
 
-        # The Scrollbar, layout to the right
-        vsb = ttk.Scrollbar(self, orient="vertical")
-        vsb.pack(side="right", fill="y")
+    if canvas.winfo_width() < canvas.canvasx(1):
+        hbar.pack(side="bottom", fill="x")
+    else:
+        hbar.pack_forget()
 
-        # The Canvas which supports the Scrollbar Interface, layout to the left
-        self.canvas = ttk.Canvas(self, borderwidth=0, background="#ffffff")
-        self.canvas.pack(side="left", fill="both", expand=True)
+root = tk.Tk()
+root.title("Scrollbar Example")
 
-        # Bind the Scrollbar to the self.canvas Scrollbar Interface
-        self.canvas.configure(yscrollcommand=vsb.set)
-        vsb.configure(command=self.canvas.yview)
+# Create a Canvas widget
+canvas = ctk.CTkCanvas(root, width=400, height=300, scrollregion=(0, 0, 1000, 1000))
+canvas.pack(side="left", fill="both", expand=True)
 
-        # The Frame to be scrolled, layout into the canvas
-        # All widgets to be scrolled have to use this Frame as parent
-        self.scrolled_frame = ttk.Frame(self.canvas)
-        self.canvas.create_window((4, 4), window=self.scrolled_frame, anchor="nw")
+# Create a Scrollbar for vertical scrolling
+vbar = ctk.CTkFrame(root, width=10, height=300)
+canvas.set_vertical_scrollbar(vbar)
 
-        # Configures the scrollregion of the Canvas dynamically
-        self.scrolled_frame.bind("<Configure>", self.on_configure)
+# Create a Scrollbar for horizontal scrolling
+hbar = ctk.CTkFrame(root, width=400, height=10)
+canvas.set_horizontal_scrollbar(hbar)
 
-    def on_configure(self, event):
-        # Set the scroll region to encompass the scrolled frame
-        self.canvas.configure(scrollregion=self.canvas.bbox("all"))
+# Bind mouse scroll to canvas scrolling
+canvas.bind_all("<MouseWheel>", on_mouse_wheel)
 
+# Bind scroll event to update scroll region and scrollbars
+canvas.bind("<Configure>", on_scroll)
 
-class App(ttk.Window):
-    def __init__(self):
-        super().__init__()
+# Create a frame to hold content in the canvas
+frame = tk.Frame(canvas)
+canvas.create_window((0, 0), window=frame, anchor="nw")
 
-        sbf = ScrollbarFrame(self)
-        self.grid_rowconfigure(0, weight=1)
-        self.grid_columnconfigure(0, weight=1)
-        sbf.grid(row=0, column=0, sticky='nsew')
-        # sbf.pack(side="top", fill="both", expand=True)
+# Add some widgets inside the frame
+for i in range(50):
+    tk.Label(frame, text=f"Label {i}").pack()
 
-        # Some data, layout into the sbf.scrolled_frame
-        frame = sbf.scrolled_frame
-        project_row = -1
-        for name, path, date, size in projects_data:
-            project_row+=1
-            create_item(frame, name, path, date, size).grid(column=0,row=project_row)
+# Update scroll region and scrollbars initially
+frame.update_idletasks()
+canvas.config(scrollregion=canvas.bbox("all"))
+update_scrollbars()
 
-
-if __name__ == "__main__":
-    App().mainloop()
+root.mainloop()

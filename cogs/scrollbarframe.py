@@ -11,7 +11,7 @@ class ScrollbarFrame(ttk.CTkFrame):
         self.vsb.pack(side="right", fill="y")
 
         # The Canvas which supports the Scrollbar Interface, layout to the left
-        self.canvas = ttk.CTkCanvas(self,background=self.asset.black,highlightcolor=self.asset.black,highlightthickness=0)
+        self.canvas = ttk.CTkCanvas(self,background='#2e2e2e',highlightcolor=self.asset.black,highlightthickness=0)
         self.canvas.pack(side="left", fill="both", expand=True)
 
         # Bind the Scrollbar to the self.canvas Scrollbar Interface
@@ -26,9 +26,22 @@ class ScrollbarFrame(ttk.CTkFrame):
 
         # Configures the scrollregion of the Canvas dynamically
         self.scrolled_frame.bind("<Configure>", self.on_configure)
-        self.canvas.bind_all('<MouseWheel>', lambda event: self.canvas.yview_scroll(-int(event.delta / 60), "units"))
+        self.canvas.bind_all('<MouseWheel>', self.on_scroll)
 
     def on_configure(self, event):
         # Set the scroll region to encompass the scrolled frame
-        self.vsb.place_forget()
+        self.scrolled_frame.update_idletasks()
         self.canvas.configure(scrollregion=self.canvas.bbox("all"))
+
+        # if len(self.scrolled_frame.winfo_children()) < 5:
+        #     self.vsb.pack_forget()
+        # else:
+        #     self.vsb.pack(side="right", fill="y")
+        self.vsb.pack_forget()
+
+
+    def on_scroll(self, event):
+
+        if len(self.scrolled_frame.winfo_children()) > 6:
+            if event.delta:
+                self.canvas.yview_scroll(-1*(event.delta//120), "units")
