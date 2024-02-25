@@ -22,13 +22,15 @@ class Asset():
         """
 
         # images
-        self.delete = ImageTk.PhotoImage(Image.open(f'{ROOT_DIR}/assets/delete.png'))
-        self.favourite = ImageTk.PhotoImage(Image.open(f'{ROOT_DIR}/assets/favourite.png'))
-        self.new = ImageTk.PhotoImage(Image.open(f'{ROOT_DIR}/assets/new.png'))
-        self.open = ImageTk.PhotoImage(Image.open(f'{ROOT_DIR}/assets/open.png'))
-        self.reload = ImageTk.PhotoImage(Image.open(f'{ROOT_DIR}/assets/reload.png'))
-        self.rename = ImageTk.PhotoImage(Image.open(f'{ROOT_DIR}/assets/rename.png'))
-        self.workspace = ImageTk.PhotoImage(Image.open(f'{ROOT_DIR}/assets/workspace.png'))
+
+        # self.delete = ImageTk.PhotoImage(Image.open(f'{ROOT_DIR}/assets/delete.png'))
+        self.delete = ttk.CTkImage(Image.open(f'{ROOT_DIR}/assets/delete.png'))
+        self.favourite = ttk.CTkImage(Image.open(f'{ROOT_DIR}/assets/favourite.png'))
+        self.new = ttk.CTkImage(Image.open(f'{ROOT_DIR}/assets/new.png'))
+        self.open = ttk.CTkImage(Image.open(f'{ROOT_DIR}/assets/open.png'))
+        self.reload = ttk.CTkImage(Image.open(f'{ROOT_DIR}/assets/reload.png'))
+        self.rename = ttk.CTkImage(Image.open(f'{ROOT_DIR}/assets/rename.png'))
+        self.workspace = ttk.CTkImage(Image.open(f'{ROOT_DIR}/assets/workspace.png'))
 
         # font
         self.font_bold = ttk.CTkFont(family='Segoe UI',size=16)

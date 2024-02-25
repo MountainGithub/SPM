@@ -5,28 +5,13 @@ from cogs.about import About
 import subprocess    
 import os
 import datetime
+from configparser import ConfigParser
 
 class App(ttk.CTk):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-# Name, Date Created , Modify Date, Size
-        self.projects_data = [
-            ['Game #1','2/8/2024','2/8/2024',3.8],
-            ['Game #2','1/1/2024','2/8/2024',4.2],
-            ['Gamehhhhhhhhhhhh #3','2/8/2024','4/3/2023',2.3],
-            ['Game #4','4/3/2023','2/8/2024',2.3],
-            ['Game #5','4/3/2023','2/8/2024',2.3],
-            ['Game #6','4/3/2023','2/8/2024',2.3],
-            ['Game #7','4/3/2023','2/8/2024',2.3],
-            ['Game #8','4/3/2023','2/8/2024',2.3],
-            ['Gamuuuuuuuuuue #9','4/3/2023','2/8/2024',2.3],
-            ['Game #10','4/3/2023','2/8/2024',2.3],
-            ['Game #11','4/3/2023','2/8/2024',2.3],
-            ['Game #12','4/3/2023','2/8/2024',2.3],
-            ['Game #13','4/3/2023','2/8/2024',2.3],
-        ]
-
+        self.projects_data = []
 
         self.title('SPM - Sratch Projects Manager')
         self.iconbitmap('./assets/ralsei.ico')
@@ -36,7 +21,7 @@ class App(ttk.CTk):
         # load assets
         self.asset = Asset()
         self.WORKSPACE = ''
-        
+        self.load_settings()  
 
         # main frame
         main_frame = ttk.CTkFrame(self, fg_color='#1e1e1e')
@@ -86,8 +71,6 @@ class App(ttk.CTk):
 
         self.target_frame = sbf.scrolled_frame
 
-        self.create_children()
-
         # frame 3
 
         lable_frame_3 = ttk.CTkFrame(main_frame)
@@ -101,7 +84,7 @@ class App(ttk.CTk):
         workspace.pack(side='top',expand=True,fill='both',padx=10,pady=(0,10))
         
         # workspace
-        workspace.configure(command=self.choose_workspace)
+        workspace.configure(command=self.workspace_btn)
         
         ttk.CTkButton(lable_frame_3,hover_color=self.asset.hover_orange,fg_color=self.asset.orange,text_color=self.asset.black,compound='left',image=self.asset.reload,text='Reload').pack(side='top',expand=True,fill='both',padx=10,pady=(0,10))
         ttk.CTkButton(lable_frame_3,hover_color=self.asset.hover_red,fg_color=self.asset.red,text_color=self.asset.black,compound='left',image=self.asset.rename,text='Rename').pack(side='top',expand=True,fill='both',padx=10,pady=(0,10))
@@ -133,53 +116,96 @@ class App(ttk.CTk):
         about.bind("<Enter>", lambda e: about.configure(font=('', 13, "underline"), cursor="hand2"))
         about.bind("<Leave>", lambda e: about.configure(font=('', 13), cursor="arrow"))
 
+        self.change_workspace(workspace=self.WORKSPACE)
 
-    def choose_workspace(self):
-        output = ttk.filedialog.askdirectory()
-        if output != '': self.WORKSPACE = output
+    def load_settings(self):
+        if 'settings.ini' in os.listdir('./'):
+            print('Found settings.ini!')
+        else:
+            print('Missing settings.ini file, creating one...')
+            nf = ConfigParser()
+            nf.add_section('settings')
+            nf['settings']['wsdir'] = 'C:/'
+            with open('settings.ini','w') as f:
+                nf.write(f)
 
-        print(self.WORKSPACE)
+        f = ConfigParser()
+        f.read('settings.ini')
+        
+        self.WORKSPACE = f['settings']['wsdir']
 
+    def workspace_btn(self):
+        ws = self.choose_workspace()
+        if ws is None:
+            return
+        else:
+            self.change_workspace(workspace=ws)
+
+    def change_workspace(self, workspace: str):
+        self.WORKSPACE = workspace
         file_list = []
 
-        if self.WORKSPACE != '':
-            # read workspace
-            try: 
-                for file in os.listdir(self.WORKSPACE):
-                    name, extension  = os.path.splitext(file)
-                    if extension == '.sb3':
-                        created_date = os.path.getctime(f'{self.WORKSPACE}/{file}')
-                        # created_date = datetime.datetime.fromtimestamp(created_date)
+        file_list = self.load_files_from_workspace(workspace=workspace)
+        self.edit_stuff_after_change_workspace(filelist=file_list)
 
-                        modify_date = os.path.getmtime(f'{self.WORKSPACE}/{file}')
-                        # modify_date = datetime.datetime.fromtimestamp(modify_date)
+    def choose_workspace(self) -> str | None:
+        output = ttk.filedialog.askdirectory()
+        if output == '': 
+            return None
+        else:
+            return output
 
-                        size = os.path.getsize(f'{self.WORKSPACE}/{file}')
-                        size = round(size/1024/1024,2)
+    def load_files_from_workspace(self, workspace) -> list[list]:
+        fl = []
+        for file in os.listdir(workspace):
+            name, extension  = os.path.splitext(file)
+            if extension == '.sb3':
+                created_date = os.path.getctime(f'{workspace}/{file}')
+                # created_date = datetime.datetime.fromtimestamp(created_date)
 
-                        file_list.append([name,created_date,modify_date,size])
-            except:
-                pass
+                modify_date = os.path.getmtime(f'{workspace}/{file}')
+                # modify_date = datetime.datetime.fromtimestamp(modify_date)
 
-            # overwrite projects list
-            self.projects_data = file_list
+                size = os.path.getsize(f'{workspace}/{file}')
+                size = round(size/1024/1024,2)
 
-            #destroy children (lmao)
-            for child in self.target_frame.winfo_children():
-                child.destroy()
-
-            # make children
-            self.create_children()
-
-            # edit file count
-            if len(self.projects_data) == 1:   
-                self.file_counter.configure(text=f'{len(self.projects_data)} file found.')
-            else:
-                self.file_counter.configure(text=f'{len(self.projects_data)} files found.')
+                fl.append([name,created_date,modify_date,size])
         
-            
-# Name, Date Created , Modify Date, Size
+        return fl
 
+    def edit_stuff_after_change_workspace(self, filelist: list[list]) -> None:
+
+        # overwrite projects list
+        self.projects_data = filelist
+
+        #destroy children (lmao)
+        for child in self.target_frame.winfo_children():
+            child.destroy()
+
+        # make children
+        self.create_children()
+
+        # edit file count
+        if len(self.projects_data) == 1:   
+            self.file_counter.configure(text=f'{len(self.projects_data)} file found.')
+        else:
+            self.file_counter.configure(text=f'{len(self.projects_data)} files found.')
+
+        # save workspace to settings.ini
+        self.edit_settings('settings','wsdir',self.WORKSPACE)
+
+    def edit_settings(self, section: str, option:str, edit_to:str):
+        nf = ConfigParser()
+        nf.read('settings.ini')
+
+        if section not in nf.sections():
+            nf.add_section(section)
+        
+        nf[section][option] = edit_to
+
+        with open('settings.ini','w') as f:
+            nf.write(f)
+        
     def create_children(self):
         project_row = -1
         for name, created_date, modify_date, size in self.projects_data:
