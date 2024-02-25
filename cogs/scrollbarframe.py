@@ -33,7 +33,8 @@ class ScrollbarFrame(ttk.CTkFrame):
         self.scrolled_frame.update_idletasks()
         self.canvas.configure(scrollregion=self.canvas.bbox("all"))
 
-        # if len(self.scrolled_frame.winfo_children()) < 5:
+        # if len(self.scrolled_frame.winfo_children()) < 7:
+        #     print(len(self.scrolled_frame.winfo_children()))
         #     self.vsb.pack_forget()
         # else:
         #     self.vsb.pack(side="right", fill="y")

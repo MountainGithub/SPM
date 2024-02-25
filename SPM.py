@@ -12,6 +12,7 @@ class App(ttk.CTk):
         super().__init__(*args, **kwargs)
 
         self.projects_data = []
+        self.current_projects_data = []
 
         self.title('SPM - Sratch Projects Manager')
         self.iconbitmap('./assets/ralsei.ico')
@@ -24,23 +25,36 @@ class App(ttk.CTk):
         self.load_settings()  
 
         # main frame
-        main_frame = ttk.CTkFrame(self, fg_color='#1e1e1e')
-        main_frame.grid(column=0,row=0)
-        main_frame.rowconfigure((0,1,2,3,4), weight=1, uniform='a')
-        main_frame.columnconfigure((0,1,2,3,4), weight=1, uniform='a')
-
+        self.main_frame()
         # frame 1
+        self.lbf1()
+        # frame 2
+        self.lbf2()
+        # frame 3
+        self.lbf3()
+        # frame 4
+        self.lbf4()
 
-        lable_frame_1 = ttk.CTkFrame(main_frame,width=1000,fg_color='#333333')
+        self.change_workspace(workspace=self.WORKSPACE)
+
+    def main_frame(self):
+        self.main_frame = ttk.CTkFrame(self, fg_color='#1e1e1e')
+        self.main_frame.grid(column=0,row=0)
+        self.main_frame.rowconfigure((0,1,2,3,4), weight=1, uniform='a')
+        self.main_frame.columnconfigure((0,1,2,3,4), weight=1, uniform='a')
+
+    def lbf1(self):
+        lable_frame_1 = ttk.CTkFrame(self.main_frame,width=1000,fg_color='#333333')
         lable_frame_1.grid(column=0,row=0,padx=25,pady=25,sticky='nsew',columnspan=4)
 
-        search_entry = ttk.CTkEntry(lable_frame_1, width=300,placeholder_text='Search...',fg_color='#191919',border_color='#6f3131')
-        search_entry.pack(side='left',padx=(25,0))
+        self.search_entry = ttk.CTkEntry(lable_frame_1, width=300,placeholder_text='Search...',fg_color='#191919',border_color='#6f3131')
+        self.search_entry.pack(side='left',padx=(25,0),expand=True,fill='x')
+        self.search_entry.bind('<KeyRelease>', self.update_entry)
 
-        clear_button = ttk.CTkButton(lable_frame_1,text_color='#ff4d4d',border_color='#ff4d4d',hover_color='#333333',fg_color="#333333", text='Clear', command=lambda: search_entry.delete(0,'end'), width=25, font=('Segoe UI',13))
-        clear_button.bind("<Enter>", lambda e: clear_button.configure(font=('Segoe UI',13,"underline"), cursor="hand2"))
-        clear_button.bind("<Leave>", lambda e: clear_button.configure(font=('Segoe UI',13), cursor="arrow"))
-        clear_button.pack(side='left',padx=(10,25))
+        # clear_button = ttk.CTkButton(lable_frame_1,text_color='#ff4d4d',border_color='#ff4d4d',hover_color='#333333',fg_color="#333333", text='Clear', command=lambda: self.search_entry.delete(0,'end'), width=25, font=('Segoe UI',13))
+        # clear_button.bind("<Enter>", lambda e: clear_button.configure(font=('Segoe UI',13,"underline"), cursor="hand2"))
+        # clear_button.bind("<Leave>", lambda e: clear_button.configure(font=('Segoe UI',13), cursor="arrow"))
+        # clear_button.pack(side='left',padx=(10,25))
 
         value_inside = ttk.StringVar(self) 
         value_inside.set("Last Edited") 
@@ -51,18 +65,29 @@ class App(ttk.CTk):
             button_hover_color='#323232',
             dropdown_fg_color='#323232',
             text_color=self.asset.red,
-            values=['Last Edited','Name','Size','Favorited'],
-            width=110
+            values=[
+                'Recently Modified',
+                'Latest Modified',
+                'Oldest',
+                'Newest',
+                'Name',
+                'Name (Reversed)',
+                'Biggest',
+                'Smallest',
+                'Favorited'
+                ],
+            width=150,
+            command=self.update_filter,
         )
+
         filter_options.pack(side='left',padx=25)
 
-        self.file_counter = ttk.CTkLabel(lable_frame_1, text_color=self.asset.red,text='69 files found.')
+        self.file_counter = ttk.CTkLabel(lable_frame_1, text_color=self.asset.red,text='')
         self.file_counter.pack(side='left',padx=25)
+        
+    def lbf2(self):
 
-
-        # frame 2
-
-        lable_frame_2 = ttk.CTkFrame(main_frame, bg_color='#333333')
+        lable_frame_2 = ttk.CTkFrame(self.main_frame, bg_color='#333333')
         lable_frame_2.grid(column=0,row=1,sticky='nsew',padx=25,rowspan=5,pady=(0,25),columnspan=4)
 
         # target frame
@@ -70,10 +95,10 @@ class App(ttk.CTk):
         sbf.pack(expand=True,fill='both',side='top')
 
         self.target_frame = sbf.scrolled_frame
+        
+    def lbf3(self):
 
-        # frame 3
-
-        lable_frame_3 = ttk.CTkFrame(main_frame)
+        lable_frame_3 = ttk.CTkFrame(self.main_frame)
         lable_frame_3.grid(column=4,row=0,rowspan=4,sticky='ns',padx=(0,25),pady=25)
 
         # styles
@@ -82,17 +107,18 @@ class App(ttk.CTk):
         ttk.CTkButton(lable_frame_3,hover_color=self.asset.hover_blue,fg_color=self.asset.blue,text_color=self.asset.black,compound='left',image=self.asset.open,text='Open').pack(side='top',expand=True,fill='both',padx=10,pady=(0,10))
         workspace = ttk.CTkButton(lable_frame_3,hover_color=self.asset.hover_orange,fg_color=self.asset.orange,text_color=self.asset.black,compound='left',image=self.asset.workspace,text='Workspace')
         workspace.pack(side='top',expand=True,fill='both',padx=10,pady=(0,10))
-        
-        # workspace
         workspace.configure(command=self.workspace_btn)
         
-        ttk.CTkButton(lable_frame_3,hover_color=self.asset.hover_orange,fg_color=self.asset.orange,text_color=self.asset.black,compound='left',image=self.asset.reload,text='Reload').pack(side='top',expand=True,fill='both',padx=10,pady=(0,10))
+        reload_btn = ttk.CTkButton(lable_frame_3,hover_color=self.asset.hover_orange,fg_color=self.asset.orange,text_color=self.asset.black,compound='left',image=self.asset.reload,text='Reload')
+        reload_btn.pack(side='top',expand=True,fill='both',padx=10,pady=(0,10))
+        reload_btn.configure(command=self.reload_btn)
+
         ttk.CTkButton(lable_frame_3,hover_color=self.asset.hover_red,fg_color=self.asset.red,text_color=self.asset.black,compound='left',image=self.asset.rename,text='Rename').pack(side='top',expand=True,fill='both',padx=10,pady=(0,10))
         ttk.CTkButton(lable_frame_3,hover_color=self.asset.hover_red,fg_color=self.asset.red,text_color=self.asset.black,compound='left',image=self.asset.delete,text='Delete').pack(side='top',expand=True,fill='both',padx=10,pady=(0,10))
         ttk.CTkButton(lable_frame_3,hover_color=self.asset.hover_yellow,fg_color=self.asset.yellow,text_color=self.asset.black,compound='left',image=self.asset.favourite,text='Favourite').pack(side='top',expand=True,fill='both',padx=10,pady=(0,10))
-
-
-        lable_frame_4 = ttk.CTkFrame(main_frame,border_width=1,fg_color='transparent')
+        
+    def lbf4(self):
+        lable_frame_4 = ttk.CTkFrame(self.main_frame,border_width=1,fg_color='transparent')
         lable_frame_4.grid(column=4,row=4,rowspan=1,sticky='ns',padx=(0,25),pady=(0,25))
 
 
@@ -115,8 +141,6 @@ class App(ttk.CTk):
         about.bind("<Button-1>", lambda e: self.open_toplevel())
         about.bind("<Enter>", lambda e: about.configure(font=('', 13, "underline"), cursor="hand2"))
         about.bind("<Leave>", lambda e: about.configure(font=('', 13), cursor="arrow"))
-
-        self.change_workspace(workspace=self.WORKSPACE)
 
     def load_settings(self):
         if 'settings.ini' in os.listdir('./'):
@@ -163,33 +187,37 @@ class App(ttk.CTk):
                 created_date = os.path.getctime(f'{workspace}/{file}')
                 # created_date = datetime.datetime.fromtimestamp(created_date)
 
-                modify_date = os.path.getmtime(f'{workspace}/{file}')
+                modified_date = os.path.getmtime(f'{workspace}/{file}')
                 # modify_date = datetime.datetime.fromtimestamp(modify_date)
 
                 size = os.path.getsize(f'{workspace}/{file}')
                 size = round(size/1024/1024,2)
 
-                fl.append([name,created_date,modify_date,size])
+                fl.append([name,created_date,modified_date,size])
         
         return fl
 
-    def edit_stuff_after_change_workspace(self, filelist: list[list]) -> None:
-
-        # overwrite projects list
-        self.projects_data = filelist
+    def edit_stuff_after_change_workspace(self, filelist: list[list], overwrite:bool = True, overwrite_current:bool = True) -> None:
 
         #destroy children (lmao)
         for child in self.target_frame.winfo_children():
             child.destroy()
 
         # make children
-        self.create_children()
+        self.create_children(filelist=filelist)
 
         # edit file count
-        if len(self.projects_data) == 1:   
-            self.file_counter.configure(text=f'{len(self.projects_data)} file found.')
+        if len(filelist) == 1:   
+            self.file_counter.configure(text=f'{len(filelist)} file found.')
         else:
-            self.file_counter.configure(text=f'{len(self.projects_data)} files found.')
+            self.file_counter.configure(text=f'{len(filelist)} files found.')
+
+        # overwrite projects list
+        if overwrite: 
+            self.projects_data = filelist
+
+        if overwrite_current:
+            self.current_projects_data = filelist
 
         # save workspace to settings.ini
         self.edit_settings('settings','wsdir',self.WORKSPACE)
@@ -206,9 +234,10 @@ class App(ttk.CTk):
         with open('settings.ini','w') as f:
             nf.write(f)
         
-    def create_children(self):
+    def create_children(self, filelist:list[list] = None):
+        if filelist is None: filelist = self.projects_data
         project_row = -1
-        for name, created_date, modify_date, size in self.projects_data:
+        for name, created_date, modify_date, size in filelist:
             project_row+=1
             self.create_item(self.target_frame, name, created_date, modify_date, size, project_row).grid(column=0,row=project_row)
 
@@ -219,7 +248,7 @@ class App(ttk.CTk):
         else:
             self.toplevel_window.focus()  # if window exists focus it
 
-    def create_item(self, master, name:str, created_date:str , modify_date:str , size, style):
+    def create_item(self, master, name:str, created_date:str , modified_date:str , size, style):
         frame = ttk.CTkFrame(master=master,corner_radius=0,bg_color='blue')
         frame.grid(column=0,row=0,sticky='nsew',ipady=20)
 
@@ -240,6 +269,51 @@ class App(ttk.CTk):
         # btn = ttk.CTkButton(frame,text=name,width=450,height=100)
         # btn.pack(side='left',expand=True,fill='both',padx=20,pady=20)
         return frame
+
+    def reload_btn(self) -> None:
+        self.edit_stuff_after_change_workspace(self.projects_data)
+        self.search_entry.delete(0,'end')
+
+    def update_entry(self, e) -> None:
+        typed = self.search_entry.get()
+
+        result = []
+        if typed == '':
+            result = self.projects_data
+        else:
+            for project in self.projects_data:
+                if typed.lower() in project[0].lower():
+                    result.append(project)
+
+        self.edit_stuff_after_change_workspace(result, overwrite=False)
+
+    def update_filter(self, selection):
+        print(self.current_projects_data)
+
+        # Name, Modified Date, Created Date, Size, Favourited
+
+        sorted_list = []
+        if selection == 'Recently Modified':
+            sorted_list = sorted(self.current_projects_data, key=lambda x:x[0])
+        elif selection == 'Latest Modified':
+            sorted_list = sorted(self.current_projects_data, key=lambda x:x[0],reverse=True)
+        elif selection == 'Oldest':
+            sorted_list = sorted(self.current_projects_data, key=lambda x:x[1])
+        elif selection == 'Newest':
+            sorted_list = sorted(self.current_projects_data, key=lambda x:x[1],reverse=True)
+        elif selection == 'Name':
+            sorted_list = sorted(self.current_projects_data, key=lambda x:x[2])
+        elif selection == 'Name (Reversed)':
+            sorted_list = sorted(self.current_projects_data, key=lambda x:x[2],reverse=True)
+        elif selection == 'Biggest':
+            sorted_list = sorted(self.current_projects_data, key=lambda x:x[3])
+        elif selection == 'Smallest':
+            sorted_list = sorted(self.current_projects_data, key=lambda x:x[3],reverse=True)
+        elif selection == 'Favourited':
+            ...
+
+        self.edit_stuff_after_change_workspace(sorted_list, overwrite=False, overwrite_current=False)
+            
 
 app = App()
 app.mainloop()
