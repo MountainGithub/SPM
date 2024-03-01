@@ -20,13 +20,15 @@ class ScrollbarFrame(ttk.CTkFrame):
 
         # The Frame to be scrolled, layout into the canvas
         # All widgets to be scrolled have to use this Frame as parent
-        self.scrolled_frame = ttk.CTkFrame(self.canvas)
+        self.scrolled_frame = ttk.CTkFrame(self.canvas, bg_color='#2e2e2e', fg_color='#2e2e2e')
         self.scrolled_frame.pack(fill="x", expand=True)
         self.canvas.create_window((4, 4), window=self.scrolled_frame, anchor="nw")
 
         # Configures the scrollregion of the Canvas dynamically
         self.scrolled_frame.bind("<Configure>", self.on_configure)
         self.canvas.bind_all('<MouseWheel>', self.on_scroll)
+
+        print(self.winfo_children())
 
     def on_configure(self, event):
         # Set the scroll region to encompass the scrolled frame

@@ -34,6 +34,8 @@ class App(ttk.CTk):
         self.lbf3()
         # frame 4
         self.lbf4()
+        # framw 5
+        self.lbf5()
 
         self.change_workspace(workspace=self.WORKSPACE)
 
@@ -87,8 +89,8 @@ class App(ttk.CTk):
         
     def lbf2(self):
 
-        lable_frame_2 = ttk.CTkFrame(self.main_frame, bg_color='#333333')
-        lable_frame_2.grid(column=0,row=1,sticky='nsew',padx=25,rowspan=5,pady=(0,25),columnspan=4)
+        lable_frame_2 = ttk.CTkFrame(self.main_frame)
+        lable_frame_2.grid(column=0,row=1,sticky='nsew',padx=25,rowspan=3,pady=(0,25),columnspan=4)
 
         # target frame
         sbf = ScrollbarFrame(lable_frame_2)
@@ -141,6 +143,13 @@ class App(ttk.CTk):
         about.bind("<Button-1>", lambda e: self.open_toplevel())
         about.bind("<Enter>", lambda e: about.configure(font=('', 13, "underline"), cursor="hand2"))
         about.bind("<Leave>", lambda e: about.configure(font=('', 13), cursor="arrow"))
+
+    def lbf5(self):
+        lable_frame_5 = ttk.CTkFrame(self.main_frame)
+        lable_frame_5.grid(column=0,row=4,padx=25,pady=(0,25),columnspan=4,sticky='nsew')
+
+        ttk.CTkLabel(lable_frame_5,text='hello').pack()
+
 
     def load_settings(self):
         if 'settings.ini' in os.listdir('./'):
