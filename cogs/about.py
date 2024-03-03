@@ -45,6 +45,7 @@ class About(ttk.CTkToplevel):
         self.frame = ttk.CTkFrame(self,fg_color='transparent')
         self.label4 = ttk.CTkLabel(self.frame, text="Discord:", font=('',12))
         self.label5 = ttk.CTkLabel(self.frame, text="notmountain", font=('',12))
+        ttk.CTkLabel(self, text='pls dont copyright me for using smoking ralsei image :(',font=('',10)).grid(sticky='w',column=5,row=3)
         self.copy = ttk.CTkLabel(self.frame, text="⠀ ⠀ ⠀ ⠀", font=('',12),text_color='#4c97ff')
 
         self.label.grid(column=0,row=0,columnspan=6,padx=20, pady=(20,0))
