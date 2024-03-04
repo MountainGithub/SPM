@@ -6,7 +6,7 @@ import subprocess
 import os
 from datetime import datetime
 from configparser import ConfigParser
-import emoji
+import shutil
 
 class App(ttk.CTk):
     def __init__(self, *args, **kwargs):
@@ -54,14 +54,10 @@ class App(ttk.CTk):
         self.search_entry.pack(side='left',padx=(25,0),expand=True,fill='x')
         self.search_entry.bind('<KeyRelease>', self.update_entry)
 
-        # clear_button = ttk.CTkButton(lable_frame_1,text_color='#ff4d4d',border_color='#ff4d4d',hover_color='#333333',fg_color="#333333", text='Clear', command=lambda: self.search_entry.delete(0,'end'), width=25, font=('Segoe UI',13))
-        # clear_button.bind("<Enter>", lambda e: clear_button.configure(font=('Segoe UI',13,"underline"), cursor="hand2"))
-        # clear_button.bind("<Leave>", lambda e: clear_button.configure(font=('Segoe UI',13), cursor="arrow"))
-        # clear_button.pack(side='left',padx=(10,25))
 
-        value_inside = ttk.StringVar(self) 
-        value_inside.set("Last Edited") 
-        filter_options = ttk.CTkOptionMenu(
+        self.value_inside = ttk.StringVar(self) 
+        self.value_inside.set("Filter") 
+        self.filter_options = ttk.CTkOptionMenu(
             lable_frame_1,
             fg_color='#323232',
             button_color='#323232',
@@ -79,11 +75,12 @@ class App(ttk.CTk):
                 'Smallest',
                 'Favorited'
                 ],
+            variable=self.value_inside,
             width=175,
             command=self.update_filter,
         )
 
-        filter_options.pack(side='left',padx=25)
+        self.filter_options.pack(side='left',padx=25)
 
         self.file_counter = ttk.CTkLabel(lable_frame_1, text_color=self.asset.red,text='')
         self.file_counter.pack(side='left',padx=25)
@@ -108,9 +105,11 @@ class App(ttk.CTk):
 
         new_btn = ttk.CTkButton(lable_frame_3,font=('',15),height=40,hover_color=self.asset.hover_green,fg_color=self.asset.green,text_color=self.asset.white,compound='left',text='New Project',width=20)
         new_btn.pack(side='top',expand=True,fill='x',padx=10)
+        new_btn.configure(command=self.newfile)
 
         open_btn = ttk.CTkButton(lable_frame_3,font=('',15),height=40,hover_color=self.asset.hover_blue,fg_color=self.asset.blue,text_color=self.asset.white,compound='left',text='Open')
         open_btn.pack(side='top',expand=True,fill='x',padx=10)
+        open_btn.configure(command=self.open_btn)
         
         workspace = ttk.CTkButton(lable_frame_3,font=('',15),height=40,hover_color=self.asset.hover_orange,fg_color=self.asset.orange,text_color=self.asset.white,compound='left',text='Workspace')
         workspace.pack(side='top',expand=True,fill='x',padx=10)
@@ -238,7 +237,11 @@ class App(ttk.CTk):
         
         return fl
 
-    def edit_stuff_after_change_workspace(self, filelist: list[list], overwrite:bool = True, overwrite_current:bool = True) -> None:
+    def edit_stuff_after_change_workspace(self, filelist: list[list], overwrite:bool = True, overwrite_current:bool = True, reload_workspace:bool = False) -> None:
+
+        # 
+        if reload_workspace:
+            filelist = self.load_files_from_workspace(self.WORKSPACE)
 
         #destroy children (lmao)
         for child in self.target_frame.winfo_children():
@@ -302,11 +305,6 @@ class App(ttk.CTk):
         for project in self.projects_data:
             if project[0] == text:
 
-                ####
-                for p in self.projects_data:
-                    print(p[2])
-                ####
-
                 print(project)
 
                 t = datetime.fromtimestamp(project[1])
@@ -348,7 +346,9 @@ class App(ttk.CTk):
         return frame
 
     def reload_btn(self) -> None:
-        self.edit_stuff_after_change_workspace(self.projects_data)
+        self.value_inside.set('Filter')
+        self.filter_options.configure(variable=self.value_inside)
+        self.edit_stuff_after_change_workspace(self.projects_data, reload_workspace=True)
         self.search_entry.delete(0,'end')
 
     def update_entry(self, e) -> None:
@@ -424,14 +424,20 @@ class App(ttk.CTk):
             return f"{minutes} {'minute' if minutes == 1 else 'minutes'} ago"
         else:
             return f"{seconds} {'second' if seconds == 1 else 'seconds'} ago"
+        
+    def newfile(self):
+        dialog = ttk.CTkInputDialog(text="Name your project:", title="Name your project")
+        text = dialog.get_input()
+        if text is None: return
+        shutil.copyfile('./assets/example.sb3',f'{self.WORKSPACE}/{text}.sb3')
+        self.openfile(filename=text)
 
-        # Example usage
-        dt1 = datetime(2024, 3, 3, 14, 55)  # Replace with your earlier datetime
-        dt2 = datetime.now()  # Replace with your later datetime
+    def openfile(self, filename: str):
+        os.startfile(f'{self.WORKSPACE}/{filename}.sb3')
 
-        time_diff = time_since(dt1, dt2)
-        print(time_diff)
-
+    def open_btn(self):
+        if self.info_name.cget("text") is None: return
+        self.openfile(filename=self.info_name.cget("text"))
 
 app = App()
 app.mainloop()
