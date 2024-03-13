@@ -22,7 +22,7 @@ class About(ttk.CTkToplevel):
         self.after(200, lambda: self.iconbitmap(f'{ROOT_DIR}/assets/ralsei.ico'))
         # self.iconbitmap(f'{ROOT_DIR}/assets/ralsei.ico')
 
-        self.after(100, self.lift)
+        self.after(200, self.lift)
         self.focus()
 
         self.columnconfigure((0,1,2,3,4,5), weight=1)
