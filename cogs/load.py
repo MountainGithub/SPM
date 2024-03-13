@@ -33,7 +33,12 @@ class Asset():
         # self.workspace = ttk.CTkImage(Image.open(f'{ROOT_DIR}/assets/workspace.png'))
 
         # font
-        self.font_bold = ttk.CTkFont(family='Segoe UI',size=16)
+        # self.font_bold = ttk.CTkFont(family='Ojuju',size=16)
+        self.font_small = ttk.CTkFont(family='Varela Round',size=12)
+        self.font_small_underline = ttk.CTkFont(family='Varela Round',size=12,underline=True)
+        self.font_normal = ttk.CTkFont(family='Varela Round',size=12,weight='bold',)
+        self.font_bold = ttk.CTkFont(family='Varela Round',size=24,weight='bold',)
+        self.font_title = ttk.CTkFont(family='Varela Round',size=24,weight='bold')
         # self.font = ttk.CTkFont(family='Azeret Mono Medium',size=12)
         # self.font = ttk.CTkFont(family='Sans Serif',size=12,weight='bold')
 

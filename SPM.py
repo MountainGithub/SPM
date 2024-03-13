@@ -41,13 +41,13 @@ class App(ttk.CTk):
         self.change_workspace(workspace=self.WORKSPACE)
 
     def main_frame(self):
-        self.main_frame = ttk.CTkFrame(self, fg_color='#1e1e1e')
+        self.main_frame = ttk.CTkFrame(self, fg_color='#191919')
         self.main_frame.grid(column=0,row=0)
         self.main_frame.rowconfigure((0,1,2,3,4), weight=1, uniform='a')
         self.main_frame.columnconfigure((0,1,2,3,4), weight=1, uniform='a')
 
     def lbf1(self):
-        lable_frame_1 = ttk.CTkFrame(self.main_frame,width=1000,fg_color='#333333')
+        lable_frame_1 = ttk.CTkFrame(self.main_frame,width=1000,fg_color='#1e1e1e')
         lable_frame_1.grid(column=0,row=0,padx=25,pady=25,sticky='nsew',columnspan=4)
 
         self.search_entry = ttk.CTkEntry(lable_frame_1, width=200,placeholder_text='Search...',fg_color='#191919',border_color='#6f3131')
@@ -59,10 +59,11 @@ class App(ttk.CTk):
         self.value_inside.set("Filter") 
         self.filter_options = ttk.CTkOptionMenu(
             lable_frame_1,
-            fg_color='#323232',
-            button_color='#323232',
-            button_hover_color='#323232',
-            dropdown_fg_color='#323232',
+            fg_color='#1e1e1e',
+            button_color='#1e1e1e',
+            button_hover_color='#1e1e1e',
+            dropdown_fg_color='#1e1e1e',
+            corner_radius=3,
             text_color=self.asset.red,
             values=[
                 'Recently Modified',
@@ -82,7 +83,7 @@ class App(ttk.CTk):
 
         self.filter_options.pack(side='left',padx=25)
 
-        self.file_counter = ttk.CTkLabel(lable_frame_1, text_color=self.asset.red,text='')
+        self.file_counter = ttk.CTkLabel(lable_frame_1, text_color=self.asset.red, fg_color='#1e1e1e',corner_radius=3,text='')
         self.file_counter.pack(side='left',padx=25)
         
     def lbf2(self):
@@ -98,64 +99,64 @@ class App(ttk.CTk):
         
     def lbf3(self):
 
-        lable_frame_3 = ttk.CTkFrame(self.main_frame,fg_color='#1e1e1e',border_color='#882f2f',border_width=1)
+        lable_frame_3 = ttk.CTkFrame(self.main_frame,fg_color='transparent')
         lable_frame_3.grid(column=4,row=0,rowspan=4,sticky='ns',padx=(0,25),pady=25)
 
         # styles
 
-        new_btn = ttk.CTkButton(lable_frame_3,font=('',15),height=40,hover_color=self.asset.hover_green,fg_color=self.asset.green,text_color=self.asset.white,compound='left',text='New Project',width=20)
+        new_btn = ttk.CTkButton(lable_frame_3,font=self.asset.font_small,height=40,hover_color=self.asset.green,fg_color='#191919',border_width=2,corner_radius=0,border_color=self.asset.green,text_color=self.asset.white,compound='left',text='New Project',width=20)
         new_btn.pack(side='top',expand=True,fill='x',padx=10)
         new_btn.configure(command=self.newfile)
 
-        open_btn = ttk.CTkButton(lable_frame_3,font=('',15),height=40,hover_color=self.asset.hover_blue,fg_color=self.asset.blue,text_color=self.asset.white,compound='left',text='Open')
+        open_btn = ttk.CTkButton(lable_frame_3,font=self.asset.font_small,height=40,hover_color=self.asset.blue,fg_color='#191919',border_width=2,corner_radius=0,border_color=self.asset.blue,text_color=self.asset.white,compound='left',text='Open')
         open_btn.pack(side='top',expand=True,fill='x',padx=10)
         open_btn.configure(command=self.open_btn)
         
-        workspace = ttk.CTkButton(lable_frame_3,font=('',15),height=40,hover_color=self.asset.hover_orange,fg_color=self.asset.orange,text_color=self.asset.white,compound='left',text='Workspace')
+        workspace = ttk.CTkButton(lable_frame_3,font=self.asset.font_small,height=40,hover_color=self.asset.orange,fg_color='#191919',border_width=2,corner_radius=0,border_color=self.asset.orange,text_color=self.asset.white,compound='left',text='Workspace')
         workspace.pack(side='top',expand=True,fill='x',padx=10)
 
         workspace.configure(command=self.workspace_btn)
         
-        reload_btn = ttk.CTkButton(lable_frame_3,font=('',15),height=40,hover_color=self.asset.hover_orange,fg_color=self.asset.orange,text_color=self.asset.white,compound='left',text='Reload')
+        reload_btn = ttk.CTkButton(lable_frame_3,font=self.asset.font_small,height=40,hover_color=self.asset.orange,fg_color='#191919',border_width=2,corner_radius=0,border_color=self.asset.orange,text_color=self.asset.white,compound='left',text='Reload')
         reload_btn.pack(side='top',expand=True,fill='x',padx=10)
         reload_btn.configure(command=self.reload_btn)
 
-        rename_btn = ttk.CTkButton(lable_frame_3,font=('',15),height=40,hover_color=self.asset.hover_red,fg_color=self.asset.red,text_color=self.asset.white,compound='left',text='Rename')
+        rename_btn = ttk.CTkButton(lable_frame_3,font=self.asset.font_small,height=40,hover_color=self.asset.red,fg_color='#191919',border_width=2,corner_radius=0,border_color=self.asset.red,text_color=self.asset.white,compound='left',text='Rename')
         rename_btn.pack(side='top',expand=True,fill='x',padx=10)
         
-        delete_btn = ttk.CTkButton(lable_frame_3,font=('',15),height=40,hover_color=self.asset.hover_red,fg_color=self.asset.red,text_color=self.asset.white,compound='left',text='Delete')
+        delete_btn = ttk.CTkButton(lable_frame_3,font=self.asset.font_small,height=40,hover_color=self.asset.red,fg_color='#191919',border_width=2,corner_radius=0,border_color=self.asset.red,text_color=self.asset.white,compound='left',text='Delete')
         delete_btn.pack(side='top',expand=True,fill='x',padx=10)
         
-        fav_btn = ttk.CTkButton(lable_frame_3,font=('',15),height=40,hover_color=self.asset.hover_yellow,fg_color=self.asset.yellow,text_color=self.asset.white,compound='left',text='Favourite')
+        fav_btn = ttk.CTkButton(lable_frame_3,font=self.asset.font_small,height=40,hover_color=self.asset.yellow,fg_color='#191919',border_width=2,corner_radius=0,border_color=self.asset.yellow,text_color=self.asset.white,compound='left',text='Favourite')
         fav_btn.pack(side='top',expand=True,fill='x',padx=10)
         
     def lbf4(self):
-        lable_frame_4 = ttk.CTkFrame(self.main_frame,border_width=1,fg_color='transparent')
-        lable_frame_4.grid(column=4,row=4,rowspan=1,sticky='ns',padx=(0,25),pady=(0,25))
+        lable_frame_4 = ttk.CTkFrame(self.main_frame,fg_color='transparent')
+        lable_frame_4.grid(column=4,row=4,sticky='ns',padx=(0,25),pady=(0,25))
 
 
         self.toplevel_window = None
         # size, last edited, show in fe button
         # size_label = ttk.CTkLabel(lable_frame_4, text='Size: 69MB).pack(side='top',expand=True,fill='both',padx=10)
         # size_label = ttk.CTkLabel(lable_frame_4, text='Last Edited: 69/69/6969).pack(side='top',expand=True,fill='both',padx=10)
-        reveal = ttk.CTkLabel(lable_frame_4,text='Reveal Workspace',font=('', 13), text_color="#4fa5e2")
-        about = ttk.CTkLabel(lable_frame_4,text='About',font=('', 13), text_color="#4fa5e2")
-        test = ttk.CTkLabel(lable_frame_4,text='About',font=('', 13), text_color="#4fa5e2")
+        reveal = ttk.CTkLabel(lable_frame_4,text='Reveal Workspace',font=self.asset.font_small, text_color="#4fa5e2")
+        about = ttk.CTkLabel(lable_frame_4,text='About',font=self.asset.font_small, text_color="#4fa5e2")
+        test = ttk.CTkLabel(lable_frame_4,text='Reveal Source Folder',font=self.asset.font_small, text_color="#4fa5e2")
         reveal.pack(side='top',expand=True,fill='both')
         test.pack(side='top',expand=True,fill='both')
-        about.pack(side='top',expand=True,fill='both',pady=(0,15))
+        about.pack(side='top',expand=True,fill='both')
         # size_label = ttk.CTkLabel(lable_frame_4, text='Created Date: 69/69/6969').pack(side='top',expand=True,fill='both',padx=10)
         
         reveal.bind("<Button-1>", lambda e: subprocess.Popen(rf'explorer /select,"{self.WORKSPACE}"'))
-        reveal.bind("<Enter>", lambda e: reveal.configure(font=('', 13, "underline"), cursor="hand2"))
-        reveal.bind("<Leave>", lambda e: reveal.configure(font=('', 13), cursor="arrow"))
+        reveal.bind("<Enter>", lambda e: reveal.configure(font=self.asset.font_small_underline, cursor="hand2"))
+        reveal.bind("<Leave>", lambda e: reveal.configure(font=self.asset.font_small, cursor="arrow"))
         
         about.bind("<Button-1>", lambda e: self.open_toplevel())
-        about.bind("<Enter>", lambda e: about.configure(font=('', 13, "underline"), cursor="hand2"))
-        about.bind("<Leave>", lambda e: about.configure(font=('', 13), cursor="arrow"))
+        about.bind("<Enter>", lambda e: about.configure(font=self.asset.font_small_underline, cursor="hand2"))
+        about.bind("<Leave>", lambda e: about.configure(font=self.asset.font_small, cursor="arrow"))
 
     def lbf5(self):
-        lable_frame_5 = ttk.CTkFrame(self.main_frame)
+        lable_frame_5 = ttk.CTkFrame(self.main_frame,fg_color='#1e1e1e')
         lable_frame_5.grid(column=0,row=4,padx=25,pady=(0,25),columnspan=4,sticky='nsew')
 
         lable_frame_5.grid_columnconfigure((0),weight=1,uniform='a')
@@ -164,22 +165,22 @@ class App(ttk.CTk):
         # f1 = ttk.CTkFrame(lable_frame_5)
         # f1.grid(row=0,column=0,sticky='nsew')
 
-        f2 = ttk.CTkFrame(lable_frame_5,border_width=1)
+        f2 = ttk.CTkFrame(lable_frame_5,fg_color='#1e1e1e')
         f2.grid(row=1,column=0,sticky='nsew')
 
-        self.info_name = ttk.CTkLabel(lable_frame_5,text='NAME',font=('',20,'bold'),text_color='#ffcc66')
+        self.info_name = ttk.CTkLabel(lable_frame_5,text='NAME',font=self.asset.font_title,text_color='#ff4d4d')
         # lb1.pack(expand=True,fill='both')
-        self.info_name.grid(row=0,column=0,sticky='nsew')
+        self.info_name.grid(row=0,column=0,sticky='s')
 
 
-        self.info_cdate = ttk.CTkLabel(f2,text='CDATE: 00/00/2000')
-        self.info_cdate.pack(side='left',expand=True,fill='both',anchor='n')
+        self.info_cdate = ttk.CTkLabel(f2,text='C.Date: 00/00/2000',font=self.asset.font_small)
+        self.info_cdate.pack(side='left',expand=True,fill='x',anchor='n',pady=(5,0))
 
-        self.info_mdate = ttk.CTkLabel(f2,text='MDATE: 00/00/2000')
-        self.info_mdate.pack(side='left',expand=True,fill='both',anchor='n')
+        self.info_mdate = ttk.CTkLabel(f2,text='M.Date: 00/00/2000',font=self.asset.font_small)
+        self.info_mdate.pack(side='left',expand=True,fill='x',anchor='n',pady=(5,0))
 
-        self.info_size = ttk.CTkLabel(f2,text='SIZE: 69,69MB')
-        self.info_size.pack(side='left',expand=True,fill='both',anchor='n')
+        self.info_size = ttk.CTkLabel(f2,text='Size: 69,69 MB',font=self.asset.font_small)
+        self.info_size.pack(side='left',expand=True,fill='x',anchor='n',pady=(5,0))
 
 
     def load_settings(self):
@@ -294,7 +295,7 @@ class App(ttk.CTk):
             self.toplevel_window.focus()  # if window exists focus it
 
     def on_hover(self, btn):
-        btn.configure(border_width=1,border_color='#e1e1e1')
+        btn.configure(border_width=1,border_color='#6f3131')
 
     def off_hover(self, btn):
         btn.configure(border_width=0)
@@ -312,9 +313,9 @@ class App(ttk.CTk):
                 mdate = self.time_since(datetime.fromtimestamp(project[2]),datetime.now())
 
                 self.info_name.configure(text=project[0])
-                self.info_cdate.configure(text=f'CDATE: {cdate}')
-                self.info_mdate.configure(text=f'MDATE: {mdate}')
-                self.info_size.configure(text=f'SIZE: {project[3]} MB')
+                self.info_cdate.configure(text=f'C.Date: {cdate}')
+                self.info_mdate.configure(text=f'M.Date: {mdate}')
+                self.info_size.configure(text=f'Size: {project[3]} MB')
 
                 break
 
@@ -328,7 +329,7 @@ class App(ttk.CTk):
         frame.columnconfigure((0,1,2,3,4), weight = 1, uniform = 'a')
 
         # widgets 
-        this = ttk.CTkButton(frame,font=self.asset.font_bold,bg_color=self.asset.lighter_black,fg_color=self.asset.lighter_black,text_color=self.asset.white,corner_radius=0,text = name)
+        this = ttk.CTkButton(frame,font=self.asset.font_bold,fg_color='#1e1e1e',text_color=self.asset.white,corner_radius=0,text = name)
         this.grid(row = 0, column = 0, columnspan = 4,sticky='nsew')
 
         this.bind('<Enter>', command=lambda e: self.on_hover(this))
@@ -336,7 +337,7 @@ class App(ttk.CTk):
         this.bind('<Button-1>', command=lambda e: self.select_btn(this))
 
         # ttk.CTkButton(frame,fg_color=self.asset.lighter_black,text_color_disabled='#e2e6e9',state='disabled',corner_radius=0,text = '⠀').grid(row = 0, column = 3,sticky='nsew')
-        size_label = ttk.CTkButton(frame,fg_color=self.asset.lighter_black,text_color_disabled='#e2e6e9',state='disabled',corner_radius=0)
+        size_label = ttk.CTkButton(frame,fg_color='#1e1e1e',text_color_disabled='#e2e6e9',state='disabled',corner_radius=0)
         size_label.grid(row = 0, column = 4,sticky='nsew')
         if size == '': 
             size_label.configure(text='')

@@ -3,4 +3,10 @@ TODO:
 - favourite system
 - reveal btn fix
 
-- LAST UPDATE: 3/3/2024 
+DOING:
+- CtkDialogINput ->> Toplevel Window 
+
+DONE:
+- New darker design
+
+- LAST UPDATE: 13/3/2024
