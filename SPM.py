@@ -2,6 +2,7 @@ import customtkinter as ttk
 from cogs.scrollbarframe import ScrollbarFrame
 from cogs.load import Asset
 from cogs.about import About
+from cogs.input import Input
 import subprocess    
 import os
 from datetime import datetime
@@ -140,10 +141,10 @@ class App(ttk.CTk):
         # size_label = ttk.CTkLabel(lable_frame_4, text='Size: 69MB).pack(side='top',expand=True,fill='both',padx=10)
         # size_label = ttk.CTkLabel(lable_frame_4, text='Last Edited: 69/69/6969).pack(side='top',expand=True,fill='both',padx=10)
         reveal = ttk.CTkLabel(lable_frame_4,text='Reveal Workspace',font=self.asset.font_small, text_color="#4fa5e2")
+        source = ttk.CTkLabel(lable_frame_4,text='Reveal Source Folder',font=self.asset.font_small, text_color="#4fa5e2")
         about = ttk.CTkLabel(lable_frame_4,text='About',font=self.asset.font_small, text_color="#4fa5e2")
-        test = ttk.CTkLabel(lable_frame_4,text='Reveal Source Folder',font=self.asset.font_small, text_color="#4fa5e2")
         reveal.pack(side='top',expand=True,fill='both')
-        test.pack(side='top',expand=True,fill='both')
+        source.pack(side='top',expand=True,fill='both')
         about.pack(side='top',expand=True,fill='both')
         # size_label = ttk.CTkLabel(lable_frame_4, text='Created Date: 69/69/6969').pack(side='top',expand=True,fill='both',padx=10)
         
@@ -151,9 +152,13 @@ class App(ttk.CTk):
         reveal.bind("<Enter>", lambda e: reveal.configure(font=self.asset.font_small_underline, cursor="hand2"))
         reveal.bind("<Leave>", lambda e: reveal.configure(font=self.asset.font_small, cursor="arrow"))
         
-        about.bind("<Button-1>", lambda e: self.open_toplevel())
+        about.bind("<Button-1>", lambda e: self.open_toplevel_about())
         about.bind("<Enter>", lambda e: about.configure(font=self.asset.font_small_underline, cursor="hand2"))
         about.bind("<Leave>", lambda e: about.configure(font=self.asset.font_small, cursor="arrow"))
+
+        source.bind("<Button-1>", lambda e: self.open_toplevel_input(text='Name your project:', title='Name your project'))
+        source.bind("<Enter>", lambda e: source.configure(font=self.asset.font_small_underline, cursor="hand2"))
+        source.bind("<Leave>", lambda e: source.configure(font=self.asset.font_small, cursor="arrow"))
 
     def lbf5(self):
         lable_frame_5 = ttk.CTkFrame(self.main_frame,fg_color='#1e1e1e')
@@ -287,10 +292,15 @@ class App(ttk.CTk):
             project_row+=1
             self.create_item(self.target_frame, name, created_date, modify_date, size, project_row).grid(column=0,row=project_row)
 
-    def open_toplevel(self):
+    def open_toplevel_about(self):
         if self.toplevel_window is None or not self.toplevel_window.winfo_exists():
-            print('hello')
             self.toplevel_window = About(root=self)  # create window if its None or destroyed
+        else:
+            self.toplevel_window.focus()  # if window exists focus it
+
+    def open_toplevel_input(self, text, title):
+        if self.toplevel_window is None or not self.toplevel_window.winfo_exists():
+            self.toplevel_window = Input(root=self, text=text, window_title=title)  # create window if its None or destroyed
         else:
             self.toplevel_window.focus()  # if window exists focus it
 
