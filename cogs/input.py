@@ -24,6 +24,7 @@ class Input(ttk.CTkToplevel):
         # y = root.winfo_y()
 
         # self.geometry("+%d+%d" % (x + 450, y + 200))
+        self.return_value_signal = None
         self.resizable(False,False)
         self.title(self.window_title)
         self.after(200, lambda: self.iconbitmap(f'{ROOT_DIR}/assets/ralsei.ico'))
@@ -31,6 +32,19 @@ class Input(ttk.CTkToplevel):
         self.after(200, self.focus)
         self.grab_set()
         self.after(10, self._create_widgets)  # create widgets with slight delay, to avoid white flickering of background
+
+    def _ok_button(self):
+        self.value_on_close = self._entry.get()
+        if self.return_value_signal:
+            self.return_value_signal.emit(self.value_on_close)
+        self.destroy()
+
+    def _cancel_button(self):
+        self.destroy()
+
+    def connect_return_value_signal(self, signal):
+        self.return_value_signal = signal
+
 
     def _create_widgets(self):
 
@@ -61,7 +75,7 @@ class Input(ttk.CTkToplevel):
                                     hover_color='#a5a5a5',
                                     text='Ok',
                                     font=self.asset.font_small,
-                                    command=...)
+                                    command=self._ok_button)
         self._ok_button.grid(row=2, column=0, columnspan=1, padx=(20, 10), pady=(0, 20), sticky="ew")
 
         self._cancel_button = CTkButton(master=self,
@@ -73,7 +87,7 @@ class Input(ttk.CTkToplevel):
                                         hover_color='#a5a5a5',
                                         text='Cancel',
                                         font=self.asset.font_small,
-                                        command=...)
+                                        command=self._cancel_button)
         self._cancel_button.grid(row=2, column=1, columnspan=1, padx=(10, 20), pady=(0, 20), sticky="ew")
 
         self.after(150, lambda: self._entry.focus())  # set focus to entry with slight delay, otherwise it won't work

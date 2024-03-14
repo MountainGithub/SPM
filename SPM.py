@@ -8,6 +8,7 @@ import os
 from datetime import datetime
 from configparser import ConfigParser
 import shutil
+from cogs.signal import Signal
 
 class App(ttk.CTk):
     def __init__(self, *args, **kwargs):
@@ -25,6 +26,12 @@ class App(ttk.CTk):
         self.asset = Asset()
         self.WORKSPACE = ''
         self.load_settings()  
+
+        # Create a signal for handling returned values
+        self.return_value_signal = Signal()
+
+        # Connect the signal to the handler
+        self.return_value_signal.connect(self.handle_return_value)
 
         # main frame
         self.main_frame()
@@ -136,7 +143,8 @@ class App(ttk.CTk):
         lable_frame_4.grid(column=4,row=4,sticky='ns',padx=(0,25),pady=(0,25))
 
 
-        self.toplevel_window = None
+        self.toplevel_window_about = None
+        self.toplevel_window_input = None
         # size, last edited, show in fe button
         # size_label = ttk.CTkLabel(lable_frame_4, text='Size: 69MB).pack(side='top',expand=True,fill='both',padx=10)
         # size_label = ttk.CTkLabel(lable_frame_4, text='Last Edited: 69/69/6969).pack(side='top',expand=True,fill='both',padx=10)
@@ -293,16 +301,18 @@ class App(ttk.CTk):
             self.create_item(self.target_frame, name, created_date, modify_date, size, project_row).grid(column=0,row=project_row)
 
     def open_toplevel_about(self):
-        if self.toplevel_window is None or not self.toplevel_window.winfo_exists():
-            self.toplevel_window = About(root=self)  # create window if its None or destroyed
+        if self.toplevel_window_about is None or not self.toplevel_window_about.winfo_exists():
+            self.toplevel_window_about = About(root=self)  # create window if its None or destroyed
         else:
-            self.toplevel_window.focus()  # if window exists focus it
+            self.toplevel_window_about.focus()  # if window exists focus it
 
     def open_toplevel_input(self, text, title):
-        if self.toplevel_window is None or not self.toplevel_window.winfo_exists():
-            self.toplevel_window = Input(root=self, text=text, window_title=title)  # create window if its None or destroyed
+        if self.toplevel_window_input is None or not self.toplevel_window_input.winfo_exists():
+            self.return_value = None
+            self.toplevel_window_input = Input(root=self, text=text, window_title=title)  # create window if its None or destroyed
+            self.toplevel_window_input.connect_return_value_signal(self.return_value_signal)
         else:
-            self.toplevel_window.focus()  # if window exists focus it
+            self.toplevel_window_input.focus()  # if window exists focus it
 
     def on_hover(self, btn):
         btn.configure(border_width=1,border_color='#6f3131')
@@ -346,7 +356,6 @@ class App(ttk.CTk):
         this.bind('<Leave>', command=lambda e: self.off_hover(this))
         this.bind('<Button-1>', command=lambda e: self.select_btn(this))
 
-        # ttk.CTkButton(frame,fg_color=self.asset.lighter_black,text_color_disabled='#e2e6e9',state='disabled',corner_radius=0,text = '⠀').grid(row = 0, column = 3,sticky='nsew')
         size_label = ttk.CTkButton(frame,fg_color='#1e1e1e',text_color_disabled='#e2e6e9',state='disabled',corner_radius=0)
         size_label.grid(row = 0, column = 4,sticky='nsew')
         if size == '': 
@@ -437,9 +446,15 @@ class App(ttk.CTk):
             return f"{seconds} {'second' if seconds == 1 else 'seconds'} ago"
         
     def newfile(self):
-        dialog = ttk.CTkInputDialog(text="Name your project:", title="Name your project")
-        text = dialog.get_input()
+        # dialog = ttk.CTkInputDialog(text="Name your project:", title="Name your project")
+        # text = dialog.get_input()
+        # if text is None: return
+
+        self.open_toplevel_input(text='Name your project:', title='Name your project')
+        self.wait_window(self.toplevel_window_input)
+        text = self.return_value
         if text is None: return
+
         shutil.copyfile('./assets/example.sb3',f'{self.WORKSPACE}/{text}.sb3')
         self.openfile(filename=text)
 
@@ -449,6 +464,9 @@ class App(ttk.CTk):
     def open_btn(self):
         if self.info_name.cget("text") is None: return
         self.openfile(filename=self.info_name.cget("text"))
+
+    def handle_return_value(self, value):
+        self.return_value = value
 
 app = App()
 app.mainloop()

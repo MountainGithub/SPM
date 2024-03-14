@@ -1,6 +1,4 @@
 TODO: 
-- rename btn (idk)
-- delete btn (idk)
 - fav button (mid)
 - favourite system:
  + local saves (mid)
@@ -8,14 +6,16 @@ TODO:
  + add a star img to the name (easy)
 - reveal btn fix (idk)
 - source folder btn (hard)
-- add some delay to avoid white bg when load (mid)
+- add some delay to avoid white bg when load (easy)
 
 =>> EXPORT TO EXE FILE 🚀🚀
 
 DOING:
-- get Toplevel Window returned values (idk)
+- rename btn (idk)
+- delete btn (idk)
 
 DONE:
+- get Toplevel Window returned values (mid)
 - CtkDialogINput ->> Toplevel Window (mid)
 - new,open,ws,relaod btn (hard)
 - project selection (hard)
@@ -25,4 +25,4 @@ DONE:
 - New darker design (easy)
 - ...
 
-- LAST UPDATE: 13/3/2024
+- LAST UPDATE: 3/14/2024
