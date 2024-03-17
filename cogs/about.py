@@ -41,10 +41,10 @@ class About(ttk.CTkToplevel):
         self.label3 = ttk.CTkLabel(
             self,
             text=
-            "SPM is a offline file explorer for Scratch 3\n"+
-            "I randomly came up this idea when I was bored.\n"+
+            "SPM is an offline file explorer for Scratch 3.\n"+
+            "I came up this idea when I was bored.\n"+
             "With my lack of coding skill (I tried my best),\n"+
-            "I've created this shit so don't judge me lmao.\n",
+            "I've created this program so don't judge me lmao.\n",
             font=('Varela Round',18)
         )
         self.frame = ttk.CTkFrame(self,fg_color='transparent')

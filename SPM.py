@@ -9,6 +9,7 @@ from datetime import datetime
 from configparser import ConfigParser
 import shutil
 from cogs.signal import Signal
+import send2trash
 
 class App(ttk.CTk):
     def __init__(self, *args, **kwargs):
@@ -25,6 +26,7 @@ class App(ttk.CTk):
         # load assets
         self.asset = Asset()
         self.WORKSPACE = ''
+        self._is_any_project_selected = False
         self.load_settings()  
 
         # Create a signal for handling returned values
@@ -131,9 +133,11 @@ class App(ttk.CTk):
 
         rename_btn = ttk.CTkButton(lable_frame_3,font=self.asset.font_small,height=40,hover_color=self.asset.red,fg_color='#191919',border_width=2,corner_radius=0,border_color=self.asset.red,text_color=self.asset.white,compound='left',text='Rename')
         rename_btn.pack(side='top',expand=True,fill='x',padx=10)
+        rename_btn.configure(command=self.rename_btn)
         
         delete_btn = ttk.CTkButton(lable_frame_3,font=self.asset.font_small,height=40,hover_color=self.asset.red,fg_color='#191919',border_width=2,corner_radius=0,border_color=self.asset.red,text_color=self.asset.white,compound='left',text='Delete')
         delete_btn.pack(side='top',expand=True,fill='x',padx=10)
+        delete_btn.configure(command=self.delete_btn)
         
         fav_btn = ttk.CTkButton(lable_frame_3,font=self.asset.font_small,height=40,hover_color=self.asset.yellow,fg_color='#191919',border_width=2,corner_radius=0,border_color=self.asset.yellow,text_color=self.asset.white,compound='left',text='Favourite')
         fav_btn.pack(side='top',expand=True,fill='x',padx=10)
@@ -181,18 +185,18 @@ class App(ttk.CTk):
         f2 = ttk.CTkFrame(lable_frame_5,fg_color='#1e1e1e')
         f2.grid(row=1,column=0,sticky='nsew')
 
-        self.info_name = ttk.CTkLabel(lable_frame_5,text='NAME',font=self.asset.font_title,text_color='#ff4d4d')
+        self.info_name = ttk.CTkLabel(lable_frame_5,text='Select a project...',font=self.asset.font_title,text_color='#ff4d4d')
         # lb1.pack(expand=True,fill='both')
         self.info_name.grid(row=0,column=0,sticky='s')
 
 
-        self.info_cdate = ttk.CTkLabel(f2,text='C.Date: 00/00/2000',font=self.asset.font_small)
+        self.info_cdate = ttk.CTkLabel(f2,text='',font=self.asset.font_small)
         self.info_cdate.pack(side='left',expand=True,fill='x',anchor='n',pady=(5,0))
 
-        self.info_mdate = ttk.CTkLabel(f2,text='M.Date: 00/00/2000',font=self.asset.font_small)
+        self.info_mdate = ttk.CTkLabel(f2,text='',font=self.asset.font_small)
         self.info_mdate.pack(side='left',expand=True,fill='x',anchor='n',pady=(5,0))
 
-        self.info_size = ttk.CTkLabel(f2,text='Size: 69,69 MB',font=self.asset.font_small)
+        self.info_size = ttk.CTkLabel(f2,text='',font=self.asset.font_small)
         self.info_size.pack(side='left',expand=True,fill='x',anchor='n',pady=(5,0))
 
 
@@ -306,11 +310,13 @@ class App(ttk.CTk):
         else:
             self.toplevel_window_about.focus()  # if window exists focus it
 
-    def open_toplevel_input(self, text, title):
+    def open_toplevel_input(self, text, title, bigger_size:bool = False) -> str:
         if self.toplevel_window_input is None or not self.toplevel_window_input.winfo_exists():
             self.return_value = None
-            self.toplevel_window_input = Input(root=self, text=text, window_title=title)  # create window if its None or destroyed
+            self.toplevel_window_input = Input(root=self, text=text, window_title=title, bigger_size=bigger_size)  # create window if its None or destroyed
             self.toplevel_window_input.connect_return_value_signal(self.return_value_signal)
+            self.wait_window(self.toplevel_window_input)
+            return self.return_value
         else:
             self.toplevel_window_input.focus()  # if window exists focus it
 
@@ -332,6 +338,7 @@ class App(ttk.CTk):
                 cdate = f"{t.day}/{t.month}/{t.year}" 
                 mdate = self.time_since(datetime.fromtimestamp(project[2]),datetime.now())
 
+                self._is_any_project_selected = True
                 self.info_name.configure(text=project[0])
                 self.info_cdate.configure(text=f'C.Date: {cdate}')
                 self.info_mdate.configure(text=f'M.Date: {mdate}')
@@ -385,7 +392,6 @@ class App(ttk.CTk):
         self.edit_stuff_after_change_workspace(result, overwrite=False)
 
     def update_filter(self, selection):
-        print(self.current_projects_data)
 
         # Name, Modified Date, Created Date, Size, Favourited
 
@@ -446,17 +452,29 @@ class App(ttk.CTk):
             return f"{seconds} {'second' if seconds == 1 else 'seconds'} ago"
         
     def newfile(self):
-        # dialog = ttk.CTkInputDialog(text="Name your project:", title="Name your project")
-        # text = dialog.get_input()
-        # if text is None: return
 
-        self.open_toplevel_input(text='Name your project:', title='Name your project')
-        self.wait_window(self.toplevel_window_input)
-        text = self.return_value
+        text = self.open_toplevel_input(text='Name your project:', title='Name your project')
         if text is None: return
+
+        #check if filename is existed
+        fl = self.load_files_from_workspace(self.WORKSPACE)
+        names = []
+        for project in fl:
+            names.append(project[0])
+
+        count = 1
+        pos = 0
+        while text in names:
+            if count == 1: 
+                text += "2"
+                pos = len(text)
+            else: 
+                text = text[:pos-1]+str(count)
+            count += 1
 
         shutil.copyfile('./assets/example.sb3',f'{self.WORKSPACE}/{text}.sb3')
         self.openfile(filename=text)
+        self.edit_stuff_after_change_workspace(self.projects_data, reload_workspace=True)
 
     def openfile(self, filename: str):
         os.startfile(f'{self.WORKSPACE}/{filename}.sb3')
@@ -468,5 +486,53 @@ class App(ttk.CTk):
     def handle_return_value(self, value):
         self.return_value = value
 
+    def rename_btn(self):
+        if not self._is_any_project_selected: return
+        filename = self.info_name.cget("text")
+        new_filename = self.open_toplevel_input(text=f'Rename \"{filename}\" to: ',title='Rename project')
+        if new_filename is None: return
+        
+        #check if filename is existed
+        fl = self.load_files_from_workspace(self.WORKSPACE)
+        for project in fl:
+            if project[0] == new_filename:
+                self.info_name.configure(text='File\'s name is already existed.')
+                self.info_cdate.configure(text='')
+                self.info_mdate.configure(text='')
+                self.info_size.configure(text='')
+                self._is_any_project_selected = False
+                return
+
+        os.rename(f'{self.WORKSPACE}/{filename}.sb3',f'{self.WORKSPACE}/{new_filename}.sb3')
+        self.edit_stuff_after_change_workspace(self.projects_data, reload_workspace=True)
+
+    def delete_btn(self):
+        if not self._is_any_project_selected: return
+        filename = self.info_name.cget("text")
+        text = self.open_toplevel_input(
+            text=
+            f"""
+            Before comfirming your decision,
+            It's important to understand that sometimes it's not a good idea to delete a 
+            project since you might require the scripts, artwork, and music in the future.
+            If you decide to, your project will be gone FOREVER.
+
+            Do you really want to delete \"{filename}\"?
+            If so, please type \"YES\" to proceed.
+            """,
+            title='Deletion confirm',
+            bigger_size=True,
+            )
+        if text is None: return
+        if text.lower() == 'yes':
+            path = f'{self.WORKSPACE}/{filename}.sb3'
+            os.remove(path)
+            self.info_name.configure(text='Select a file...')
+            self.info_cdate.configure(text='')
+            self.info_mdate.configure(text='')
+            self.info_size.configure(text='')
+            self._is_any_project_selected = False
+            self.edit_stuff_after_change_workspace(self.projects_data, reload_workspace=True)
+        
 app = App()
 app.mainloop()

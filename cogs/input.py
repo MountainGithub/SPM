@@ -13,11 +13,12 @@ ROOT_DIR = os.path.dirname(
 
 
 class Input(ttk.CTkToplevel):
-    def __init__(self, root, text:str = 'Enter something here:', window_title:str = 'Input',*args, **kwargs):
+    def __init__(self, root, text:str = 'Enter something here:', window_title:str = 'Input', bigger_size:bool = False,*args, **kwargs):
         super().__init__(fg_color='#191919',*args, **kwargs)
 
         self.text = text
         self.window_title = window_title
+        self.bigger_size = bigger_size
         self.asset = Asset()
 
         # x = root.winfo_x()
@@ -62,7 +63,6 @@ class Input(ttk.CTkToplevel):
                                width=230,
                                fg_color='#191919',
                                border_color='#6f3131',
-                               placeholder_text='New Project',
                                font=self.asset.font_small)
         self._entry.grid(row=1, column=0, columnspan=2, padx=20, pady=(0, 20), sticky="ew")
 
@@ -91,3 +91,12 @@ class Input(ttk.CTkToplevel):
         self._cancel_button.grid(row=2, column=1, columnspan=1, padx=(10, 20), pady=(0, 20), sticky="ew")
 
         self.after(150, lambda: self._entry.focus())  # set focus to entry with slight delay, otherwise it won't work
+
+        if self.bigger_size:
+            # self._ok_button.configure(text='Yes',border_color=self.asset.green,hover_color=self.asset.green)
+            # self._cancel_button.configure(text='No',border_color=self.asset.red,hover_color=self.asset.red)
+            
+            self._label.configure(width=500,
+                                  anchor='w',
+                                  justify='left',
+                                  wraplength=500)

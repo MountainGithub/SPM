@@ -11,7 +11,7 @@ class ScrollbarFrame(ttk.CTkFrame):
         self.vsb.pack(side="right", fill="y")
 
         # The Canvas which supports the Scrollbar Interface, layout to the left
-        self.canvas = ttk.CTkCanvas(self,background='#2e2e2e',highlightcolor=self.asset.black,highlightthickness=0)
+        self.canvas = ttk.CTkCanvas(self,background='#1e1e1e',highlightcolor=self.asset.black,highlightthickness=0)
         self.canvas.pack(side="left", fill="both", expand=True)
 
         # Bind the Scrollbar to the self.canvas Scrollbar Interface
@@ -20,7 +20,7 @@ class ScrollbarFrame(ttk.CTkFrame):
 
         # The Frame to be scrolled, layout into the canvas
         # All widgets to be scrolled have to use this Frame as parent
-        self.scrolled_frame = ttk.CTkFrame(self.canvas, bg_color='#2e2e2e', fg_color='#2e2e2e')
+        self.scrolled_frame = ttk.CTkFrame(self.canvas, bg_color='#1e1e1e', fg_color='#1e1e1e')
         self.scrolled_frame.pack(fill="x", expand=True)
         self.canvas.create_window((4, 4), window=self.scrolled_frame, anchor="nw")
 
