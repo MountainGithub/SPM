@@ -10,24 +10,27 @@ from configparser import ConfigParser
 import shutil
 from cogs.signal import Signal
 import send2trash
+import json
 
 class App(ttk.CTk):
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        super().__init__(fg_color='#191919',*args, **kwargs)
 
         self.projects_data = []
         self.current_projects_data = []
 
-        self.title('SPM - Sratch Projects Manager')
+        self.title('SPM - Scratch Projects Manager')
         self.iconbitmap('./assets/ralsei.ico')
         self.resizable(False,False)
-
+        
 
         # load assets
         self.asset = Asset()
         self.WORKSPACE = ''
+        self.favourites = []
         self._is_any_project_selected = False
         self.load_settings()  
+        self.edit_favourites(just_read=True)
 
         # Create a signal for handling returned values
         self.return_value_signal = Signal()
@@ -75,6 +78,8 @@ class App(ttk.CTk):
             dropdown_fg_color='#1e1e1e',
             corner_radius=3,
             text_color=self.asset.red,
+            dropdown_text_color='#ffffff',
+            dropdown_hover_color='#2e2e2e',
             values=[
                 'Recently Modified',
                 'Not Recently Modified',
@@ -84,7 +89,7 @@ class App(ttk.CTk):
                 'Name (Reversed)',
                 'Biggest',
                 'Smallest',
-                'Favorited'
+                'Favourited'
                 ],
             variable=self.value_inside,
             width=175,
@@ -98,7 +103,7 @@ class App(ttk.CTk):
         
     def lbf2(self):
 
-        lable_frame_2 = ttk.CTkFrame(self.main_frame)
+        lable_frame_2 = ttk.CTkFrame(self.main_frame,fg_color='#191919')
         lable_frame_2.grid(column=0,row=1,sticky='nsew',padx=25,rowspan=3,pady=(0,25),columnspan=4)
 
         # target frame
@@ -139,8 +144,9 @@ class App(ttk.CTk):
         delete_btn.pack(side='top',expand=True,fill='x',padx=10)
         delete_btn.configure(command=self.delete_btn)
         
-        fav_btn = ttk.CTkButton(lable_frame_3,font=self.asset.font_small,height=40,hover_color=self.asset.yellow,fg_color='#191919',border_width=2,corner_radius=0,border_color=self.asset.yellow,text_color=self.asset.white,compound='left',text='Favourite')
-        fav_btn.pack(side='top',expand=True,fill='x',padx=10)
+        self.the_fav_btn = ttk.CTkButton(lable_frame_3,font=self.asset.font_small,height=40,hover_color=self.asset.yellow,fg_color='#191919',border_width=2,corner_radius=0,border_color=self.asset.yellow,text_color=self.asset.white,compound='left',text='Favourite')
+        self.the_fav_btn.pack(side='top',expand=True,fill='x',padx=10)
+        self.the_fav_btn.configure(command=self.fav_btn)
         
     def lbf4(self):
         lable_frame_4 = ttk.CTkFrame(self.main_frame,fg_color='transparent')
@@ -160,7 +166,7 @@ class App(ttk.CTk):
         about.pack(side='top',expand=True,fill='both')
         # size_label = ttk.CTkLabel(lable_frame_4, text='Created Date: 69/69/6969').pack(side='top',expand=True,fill='both',padx=10)
         
-        reveal.bind("<Button-1>", lambda e: subprocess.Popen(rf'explorer /select,"{self.WORKSPACE}"'))
+        reveal.bind("<Button-1>", lambda e: os.startfile(self.WORKSPACE))
         reveal.bind("<Enter>", lambda e: reveal.configure(font=self.asset.font_small_underline, cursor="hand2"))
         reveal.bind("<Leave>", lambda e: reveal.configure(font=self.asset.font_small, cursor="arrow"))
         
@@ -168,7 +174,7 @@ class App(ttk.CTk):
         about.bind("<Enter>", lambda e: about.configure(font=self.asset.font_small_underline, cursor="hand2"))
         about.bind("<Leave>", lambda e: about.configure(font=self.asset.font_small, cursor="arrow"))
 
-        source.bind("<Button-1>", lambda e: self.open_toplevel_input(text='Name your project:', title='Name your project'))
+        source.bind("<Button-1>", lambda e: os.startfile('.'))
         source.bind("<Enter>", lambda e: source.configure(font=self.asset.font_small_underline, cursor="hand2"))
         source.bind("<Leave>", lambda e: source.configure(font=self.asset.font_small, cursor="arrow"))
 
@@ -204,7 +210,8 @@ class App(ttk.CTk):
         if 'settings.ini' in os.listdir('./'):
             print('Found settings.ini!')
         else:
-            print('Missing settings.ini file, creating one...')
+            print('Missing settings.ini, creating one...')
+            self.favourites = []
             nf = ConfigParser()
             nf.add_section('settings')
             nf['settings']['wsdir'] = 'C:/'
@@ -215,7 +222,7 @@ class App(ttk.CTk):
         f.read('settings.ini')
         
         self.WORKSPACE = f['settings']['wsdir']
-
+        
     def workspace_btn(self):
         ws = self.choose_workspace()
         if ws is None:
@@ -296,6 +303,35 @@ class App(ttk.CTk):
 
         with open('settings.ini','w') as f:
             nf.write(f)
+
+    def edit_favourites(self, name:str = None, just_read: bool = False):
+
+        if 'favourites.json' in os.listdir('./'):
+            if just_read: print('Found favourites.json!')
+        else:
+            if just_read: print('Missing favourites.json, creating one...')
+
+            data = {'0':[]}
+
+            with open('favourites.json','w') as f:
+                json.dump(data,f,indent=4)
+
+        if just_read:
+            with open('favourites.json','r') as f:
+                data = json.load(f)
+                self.favourites = data['0']
+        else:
+            with open('favourites.json','r') as f:
+                data = json.load(f)
+                if name in data['0']:
+                    data['0'].remove(name)
+                else:
+                    data['0'].append(name)
+
+                self.favourites = data['0']
+
+                with open('favourites.json','w') as f:
+                    json.dump(data,f,indent=4)
         
     def create_children(self, filelist:list[list] = None):
         if filelist is None: filelist = self.projects_data
@@ -328,6 +364,18 @@ class App(ttk.CTk):
 
     def select_btn(self, btn: ttk.CTkButton):
         text = btn.cget('text')
+
+        if text in self.favourites:
+            self.the_fav_btn.configure(text='Unfavourite')
+        else:
+            self.the_fav_btn.configure(text='Favourite')
+
+        for frame in self.target_frame.winfo_children():
+            for child in frame.winfo_children():
+                if child.cget('text') == text:
+                    child.configure(fg_color='#2e2e2e')
+                else:
+                    child.configure(fg_color='#1e1e1e')
         
         for project in self.projects_data:
             if project[0] == text:
@@ -344,9 +392,7 @@ class App(ttk.CTk):
                 self.info_mdate.configure(text=f'M.Date: {mdate}')
                 self.info_size.configure(text=f'Size: {project[3]} MB')
 
-                break
-
-        
+                break     
 
     def create_item(self, master, name:str, created_date:str , modified_date:str , size, style):
         frame = ttk.CTkFrame(master=master,corner_radius=0,bg_color='blue')
@@ -357,6 +403,8 @@ class App(ttk.CTk):
 
         # widgets 
         this = ttk.CTkButton(frame,font=self.asset.font_bold,fg_color='#1e1e1e',text_color=self.asset.white,corner_radius=0,text = name)
+        if name in self.favourites: 
+            this.configure(text_color='#ffbf00')
         this.grid(row = 0, column = 0, columnspan = 4,sticky='nsew')
 
         this.bind('<Enter>', command=lambda e: self.on_hover(this))
@@ -413,8 +461,10 @@ class App(ttk.CTk):
         elif selection == 'Smallest':
             sorted_list = sorted(self.current_projects_data, key=lambda x:x[3],reverse=True)
         elif selection == 'Favourited':
-            ...
-
+            for item in self.current_projects_data:
+                if item[0] in self.favourites:
+                    sorted_list.append(item)
+        
         self.edit_stuff_after_change_workspace(sorted_list, overwrite=False, overwrite_current=False)
 
     def time_since(self, dt1, dt2):
@@ -504,6 +554,9 @@ class App(ttk.CTk):
                 return
 
         os.rename(f'{self.WORKSPACE}/{filename}.sb3',f'{self.WORKSPACE}/{new_filename}.sb3')
+        if filename in self.favourites:
+            self.edit_favourites(filename)
+            self.edit_favourites(new_filename)
         self.edit_stuff_after_change_workspace(self.projects_data, reload_workspace=True)
 
     def delete_btn(self):
@@ -527,6 +580,7 @@ class App(ttk.CTk):
         if text.lower() == 'yes':
             path = f'{self.WORKSPACE}/{filename}.sb3'
             os.remove(path)
+            if filename in self.favourites: self.edit_favourites(filename)
             self.info_name.configure(text='Select a file...')
             self.info_cdate.configure(text='')
             self.info_mdate.configure(text='')
@@ -534,5 +588,24 @@ class App(ttk.CTk):
             self._is_any_project_selected = False
             self.edit_stuff_after_change_workspace(self.projects_data, reload_workspace=True)
         
+    def fav_btn(self):
+        # self.add_this_to_settings()
+        # self.change_text_to_yellow()
+        # self.idk()
+        filename = self.info_name.cget("text")
+        self.edit_favourites(filename)
+        if self.the_fav_btn.cget('text') == 'Favourite':
+            self.the_fav_btn.configure(text='Unfavourite')
+        else:
+            self.the_fav_btn.configure(text='Favourite')
+
+        for frame in self.target_frame.winfo_children():
+            for child in frame.winfo_children():
+                if child.cget('text') in self.favourites:
+                    child.configure(text_color='#ffbf00')
+                else:
+                    child.configure(text_color='#ffffff')
+            
+
 app = App()
 app.mainloop()

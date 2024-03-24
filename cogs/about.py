@@ -12,7 +12,7 @@ ROOT_DIR = os.path.dirname(
 
 class About(ttk.CTkToplevel):
     def __init__(self, root,*args, **kwargs):
-        super().__init__(*args, **kwargs)
+        super().__init__(fg_color='#191919',*args, **kwargs)
 
         # x = root.winfo_x()
         # y = root.winfo_y()
@@ -45,12 +45,15 @@ class About(ttk.CTkToplevel):
             "I came up this idea when I was bored.\n"+
             "With my lack of coding skill (I tried my best),\n"+
             "I've created this program so don't judge me lmao.\n",
-            font=('Varela Round',18)
+            font=('Varela Round',18),
+            text_color='#ffffff',
+            anchor='w',
+            justify='left',
         )
         self.frame = ttk.CTkFrame(self,fg_color='transparent')
-        self.label4 = ttk.CTkLabel(self.frame, text="Discord:", font=self.asset.font_small)
-        self.label5 = ttk.CTkLabel(self.frame, text="notmountain", font=self.asset.font_small)
-        ttk.CTkLabel(self, text='pls dont sue me for using smoking ralsei image :(',font=('Varela Round',8)).grid(sticky='w',column=5,row=3)
+        self.label4 = ttk.CTkLabel(self.frame, text_color='#ffffff',text="Discord:", font=self.asset.font_small)
+        self.label5 = ttk.CTkLabel(self.frame, text_color='#ffffff',text="notmountain", font=self.asset.font_small)
+        ttk.CTkLabel(self,text_color='#ffffff', text='pls dont sue me for using smoking ralsei image :(',font=('Varela Round',8)).grid(sticky='w',column=5,row=3)
         self.copy = ttk.CTkLabel(self.frame, text="⠀ ⠀ ⠀ ⠀", font=self.asset.font_small,text_color='#4c97ff')
 
         self.label.grid(column=0,row=0,columnspan=6,padx=20, pady=(20,0))
